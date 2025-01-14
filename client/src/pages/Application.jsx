@@ -1,26 +1,52 @@
-import React, { useState } from 'react'
+import React, { useContext, useState } from 'react'
 import Navbar from '../components/Navbar'
 import Footer from '../components/Footer'
 import { assets, jobsApplied } from '../assets/assets'
 import moment from 'moment'
+import { AppContext } from '../context/AppContext'
+import { useAuth, useUser } from '@clerk/clerk-react'
+import axios from 'axios'
+import { toast } from 'react-toastify'
 
 const Application = () => {
+  const {user} =useUser()
+  const {getToken}=useAuth()
   const [isEdit,setIsEdit] = useState(false)
   const [resume,setResume] = useState(null)
+  const {backend_url,userData,userApplication,fetchUserData}=useContext(AppContext)
+  const updateResume =async ()=>{
+    try {
+      const formData = new FormData()
+      formData.append('resume',resume)
+      const token = await getToken()
+      const {data} =await axios.post(backend_url+'/api/user/update-resume',formData,{headers:{Authorization:`Bearer ${token}`}})
+
+      if (data.success) {
+        toast.success(data.message)
+        await fetchUserData()
+      }else{
+        toast.error(data.message)
+      }
+      setIsEdit(null)
+      setResume(null)
+    } catch (error) {
+      toast.error(error.message)
+    }
+  }
   return (
     <>
     <Navbar/>
     <div className='container px-4 min-h-[65vh] 2xl:px-20 mx-auto my-10'>
       <h2 className=' text-xl font-semibold'>Your Resume</h2>
       <div className='flex gap-2 mb-8 mt-3'>
-        {isEdit?
+        {isEdit ||userData && userData.resume === ""?
         <>
           <label className='flex items-center' htmlFor="resumeUpload">
-            <p className=' bg-blue-100 text-blue-600 px-4 py-2 rounded-lg mr-2'>Select Resume</p>
+            <p className=' bg-blue-100 text-blue-600 px-4 py-2 rounded-lg mr-2'>{resume?resume.name:"Select Resume"}</p>
             <input id='resumeUpload' type="file" hidden accept='application/pdf' onChange={e=>setResume(e.target.files[0])} />
             <img src={assets.profile_upload_icon} alt="" />
           </label>
-          <button onClick={()=>setIsEdit(false)} className='bg-green-100 border border-green-400 rounded-lg px-4  py-2'>Save</button>
+          <button onClick={updateResume} className='bg-green-100 border border-green-400 rounded-lg px-4  py-2'>Save</button>
         </>
         :
         <div className=' flex gap-2'>
