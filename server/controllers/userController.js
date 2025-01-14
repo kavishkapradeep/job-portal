@@ -4,10 +4,10 @@ import User from "../models/User.js"
 import {v2 as cloudinary} from 'cloudinary'
 //Get user Data
 export const getUserData = async (req,res)=>{
-    const {userId} = req.auth.userId
+    const {userId} = req.auth;
 
     try {
-        const user = User.findById(userId)
+        const user = await User.findById(userId)
         if (!user) {
             res.json({success:false,message:"User not Found"})
         }

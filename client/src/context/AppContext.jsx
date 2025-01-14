@@ -1,12 +1,15 @@
 import {createContext, useEffect, useState} from 'react';
-import { jobsData } from '../assets/assets';
+
 import axios from 'axios'
 import { toast } from 'react-toastify';
+import { useAuth, useUser } from '@clerk/clerk-react';
 export const AppContext = createContext();
 
 
 export const AppContextProvider =(props)=>{
-
+    const backend_url = import.meta.env.VITE_BACKEND_URL
+    const {user} = useUser()
+    const {getToken} =useAuth()
     
     const [searchFilter,setSearchFilter]=useState({
         title:'',
@@ -17,11 +20,22 @@ export const AppContextProvider =(props)=>{
     const [showRecruiterLogin,setShowRecruiterLogin]=useState(false)
     const [companyToken,setCompanyToken] =useState(null)
     const [companyData,setCompanyData] =useState(null)
-    
-    const backend_url = import.meta.env.VITE_BACKEND_URL
+    const [userData,setUserData]=useState(null)
+    const [userApplication,setUserApplication]= useState([])
+
     //Function to fetch jobs
     const fetchJobs = async ()=>{
-        setJobs(jobsData)
+        try {
+            const  {data} =await axios.get(backend_url+'/api/jobs')
+            if (data.success) {
+                setJobs(data.jobs)
+                console.log(data.jobs);
+            }else{
+                toast.error(data.message)
+            }
+        } catch (error) {
+            toast.error(error.message)
+        }
     }
     
 
@@ -49,15 +63,38 @@ export const AppContextProvider =(props)=>{
         }
     }
 
+    //function to fetch user data
+    const fetchUserData= async ()=>{
+        try {
+            const token = await getToken();
+            const {data}= await  axios.get(backend_url+'/api/user/user',{headers:{Authorization:`Bearer ${token}`}})
+            if (data.success) {
+                setUserData(data.user)
+            } else {
+                toast.error(data.message)
+            }
+        } catch (error) {
+            toast.error(error.message)
+        }
+    }
+
     useEffect(()=>{
         fetchCompanyData()
     },[companyToken])
+
+    useEffect(()=>{
+        if (user) {
+            fetchUserData()
+            console.log(userData);
+        }
+    },[user])
     const value ={
         searchFilter,setSearchFilter,
         isSearched,setIsSearched,jobs,setJobs,
         showRecruiterLogin,setShowRecruiterLogin,
         companyToken,setCompanyToken,
-        companyData,setCompanyData,backend_url
+        companyData,setCompanyData,backend_url,
+        userData,setUserData,userApplication,setUserApplication
     }
 
     return <AppContext.Provider value={value}>

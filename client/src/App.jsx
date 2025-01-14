@@ -11,6 +11,7 @@ import ViewApplication from './pages/ViewApplication'
 import ManageJobs from './pages/ManageJobs'
 import 'quill/dist/quill.snow.css'
 import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 
 const App = () => {

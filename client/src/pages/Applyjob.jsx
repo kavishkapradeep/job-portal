@@ -1,5 +1,5 @@
 import React, { useContext, useEffect, useState } from 'react'
-import { useParams } from 'react-router-dom'
+import { useNavigate, useParams } from 'react-router-dom'
 import { AppContext } from '../context/AppContext'
 import Loading from '../components/Loading'
 import Navbar from '../components/Navbar'
@@ -8,25 +8,42 @@ import kconvert from 'k-convert'
 import moment from 'moment'
 import JobCard from '../components/JobCard'
 import Footer from '../components/Footer'
+import { toast } from 'react-toastify'
+import axios from 'axios'
 
 function Applyjob() {
   const {id} =useParams()
   const [jobData,setJobData] =useState(null)
-  const {jobs} =useContext(AppContext)
+  const {jobs,backend_url,userData} =useContext(AppContext)
+  const navigate = useNavigate()
   const fetchData = async ()=>{
-    const data = jobs.filter(job =>job._id === id)
-    if (data.length !==0) {
-      setJobData(data[0])
-      console.log(data[0]);
-    }
+     try {
+       const {data} = await axios.get(backend_url+`/api/jobs/${id}`)
+       if (data.success) {
+          setJobData(data.job)
+       }else{
+        toast.error(data.message)
+       }
+     } catch (error) {
+       toast.error(error.message)
+     }
   }
-
-  useEffect(()=>{
-    if (jobs.length>0) {
-      fetchData()  
+const applyHandler = async ()=>{
+    try {
+      if (!userData) {
+        return toast.error('Login to apply job')
+      }
+      if (!userData.resume) {
+        navigate('/applications')
+        return toast.error("Upload resume to Upload")
+      }
+    } catch (error) {
+      
     }
-    
-  },[id,jobs])
+}
+  useEffect(()=>{
+      fetchData()  
+  },[id])
 
   return jobData?(
     <>
@@ -59,7 +76,7 @@ function Applyjob() {
             </div>
           </div>
           <div className=' flex flex-col justify-center text-end text-sm max-md:mx-auto max-md:text-center'>
-             <button className='bg-blue-600 p-2.5 px-10 text-white rounded'>Apply now</button>
+             <button onClick={applyHandler} className='bg-blue-600 p-2.5 px-10 text-white rounded'>Apply now</button>
              <p className='mt-1 text-gray-600'>Posted :{moment(jobData.date).fromNow()}</p>
           </div>
         </div>
@@ -68,7 +85,7 @@ function Applyjob() {
             <h2 className='font-bold text-2xl mb-4'>Job Description</h2>
             <div className='rich-text' dangerouslySetInnerHTML={{__html:jobData.description}}>
             </div>
-            <button className='bg-blue-600 p-2.5 px-10 text-white rounded mb-6 mt-16'>App</button>
+            <button onClick={applyHandler}  className='bg-blue-600 p-2.5 px-10 text-white rounded mb-6 mt-16'>Apply</button>
          </div>
          {/* right Section for more jobs */}
          <div className='w-full lg:w-1/3 mt-8 lg:mt-0 lg:ml-0 space-y-5'>
