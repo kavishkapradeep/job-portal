@@ -6,7 +6,7 @@ const router =express.Router()
 
 router.get('/user',getUserData)
 router.post('/apply',applyForJob)
-router.post('/applications',getUserAppliedApplication)
+router.get('/applications',getUserAppliedApplication)
 router.post('/update-resume',upload.single('resume'),updateUserResume)
 
 export default router

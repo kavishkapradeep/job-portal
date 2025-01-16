@@ -39,14 +39,7 @@ export const AppContextProvider =(props)=>{
     }
     
 
-    useEffect(()=>{
-        fetchJobs()
-
-        const storedToken = localStorage.getItem('companyToken')
-        if (storedToken) {
-            setCompanyToken(storedToken)
-        }
-    },[])
+    
     //function to fetch company data
     const fetchCompanyData = async ()=>{
         try {
@@ -78,6 +71,30 @@ export const AppContextProvider =(props)=>{
         }
     }
 
+    //function to fetch user's applied application data
+    const fetchUserApplications =async ()=>{
+        
+        try {
+            const token = await getToken()
+            const {data}= await axios.get(backend_url+'/api/user/applications',{headers:{Authorization:`Bearer ${token}`}})
+            if (data.success) {
+                setUserApplication(data.applications)
+            }else{
+                toast.error(data.message)
+            }    
+        } catch (error) {
+            toast.error(error.message)
+        }
+    }
+
+    useEffect(()=>{
+        fetchJobs()
+
+        const storedToken = localStorage.getItem('companyToken')
+        if (storedToken) {
+            setCompanyToken(storedToken)
+        }
+    },[])
     useEffect(()=>{
         fetchCompanyData()
     },[companyToken])
@@ -85,7 +102,7 @@ export const AppContextProvider =(props)=>{
     useEffect(()=>{
         if (user) {
             fetchUserData()
-            console.log(userData);
+            fetchUserApplications()
         }
     },[user])
     const value ={
