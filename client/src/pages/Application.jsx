@@ -1,4 +1,4 @@
-import React, { useContext, useState } from 'react'
+import React, { useContext, useEffect, useState } from 'react'
 import Navbar from '../components/Navbar'
 import Footer from '../components/Footer'
 import { assets, jobsApplied } from '../assets/assets'
@@ -13,7 +13,7 @@ const Application = () => {
   const {getToken}=useAuth()
   const [isEdit,setIsEdit] = useState(false)
   const [resume,setResume] = useState(null)
-  const {backend_url,userData,userApplication,fetchUserData}=useContext(AppContext)
+  const {backend_url,userData,userApplication,fetchUserData,fetchUserApplications}=useContext(AppContext)
   const updateResume =async ()=>{
     try {
       const formData = new FormData()
@@ -33,6 +33,12 @@ const Application = () => {
       toast.error(error.message)
     }
   }
+
+  useEffect(()=>{
+    if (user) {
+      fetchUserApplications()
+    }
+  },[user])
   return (
     <>
     <Navbar/>
@@ -50,7 +56,7 @@ const Application = () => {
         </>
         :
         <div className=' flex gap-2'>
-          <a href="" className=' bg-blue-100 text-blue-500 px-4 py-2 rounded-lg'>
+          <a target='_blank' href={userData.resume} className=' bg-blue-100 text-blue-500 px-4 py-2 rounded-lg'>
             Resume
           </a>
           <button onClick={()=>setIsEdit(true)} className=' text-gray-500 border border-gray-300 rounded-lg px-4 py-2'>Edit</button>
