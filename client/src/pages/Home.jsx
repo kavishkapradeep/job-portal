@@ -1,9 +1,10 @@
 import React from 'react'
 import Navbar from '../components/Navbar.jsx'
 import Hero from '../components/Hero.jsx'
-import JobListing from '../../src/components/JobListing.jsx'
+
 import AppDownload from '../components/AppDownload.jsx'
 import Footer from '../components/Footer.jsx'
+import JobListing from '../components/jobListing.jsx'
 
 const Home = () => {
   return (
