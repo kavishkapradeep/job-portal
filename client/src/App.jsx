@@ -1,6 +1,6 @@
 import React, { useContext } from 'react'
 import { Route, Routes } from 'react-router-dom'
-import Home from './pages/Home'
+import Home from './pages/Home.jsx'
 import Applyjob from './pages/Applyjob'
 import Application from './pages/Application'
 import RecruiterLogin from './components/RecruiterLogin'

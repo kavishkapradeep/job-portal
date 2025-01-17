@@ -1,7 +1,7 @@
 import React, { useContext, useEffect, useState } from 'react'
-import { AppContext } from '../context/AppContext'
-import { assets, JobCategories, JobLocations } from '../assets/assets'
-import JobCard from './JobCard'
+import { AppContext } from '../context/AppContext.jsx'
+import { assets, JobCategories, JobLocations } from '../assets/assets.js'
+import JobCard from './JobCard.jsx'
 
 const JobListing = () => {
     const {isSearched, searchFilter,setSearchFilter,jobs}= useContext(AppContext)
